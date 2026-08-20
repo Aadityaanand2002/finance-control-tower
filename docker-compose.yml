@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: fct
+      POSTGRES_PASSWORD: fct_secret
+      POSTGRES_DB: finance_control_tower
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fct -d finance_control_tower"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DEMO_MODE: "true"
+      DATABASE_URL: postgresql+psycopg://fct:fct_secret@postgres:5432/finance_control_tower
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000,http://localhost:80
+      AI_PROVIDER: mock
+      DATA_PROVIDER: mock
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
