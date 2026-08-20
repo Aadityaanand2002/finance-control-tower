@@ -6,10 +6,10 @@ Built for **Razorpay AI Builder Internship 2026 — Track 4: AI Finance Controll
 
 | | |
 |---|---|
-| **App** | http://localhost:5173 (local) · Deploy via Render (`render.yaml`) |
-| **API** | http://localhost:8000 · interactive docs at `/docs` |
+| **App** | Local: http://localhost:5173 · **Live:** https://finance-control-tower.onrender.com |
+| **API** | Local: http://localhost:8000 · Live API docs: https://finance-control-tower.onrender.com/docs |
 | **Mode** | Demo Mode (Mock AI + Mock Data) — **no API keys required** |
-| **GitHub** | [github.com/Aadityaanand2002](https://github.com/Aadityaanand2002) |
+| **GitHub** | [github.com/Aadityaanand2002/finance-control-tower](https://github.com/Aadityaanand2002/finance-control-tower) |
 
 ---
 
