@@ -21,11 +21,10 @@ ENV PYTHONPATH=/app
 ENV DEMO_MODE=true
 ENV AI_PROVIDER=mock
 ENV DATA_PROVIDER=mock
-ENV DATABASE_URL=sqlite:////data/finance_control_tower.db
+ENV DATABASE_URL=sqlite:////tmp/finance_control_tower.db
 ENV CORS_ORIGINS=*
 ENV SERVE_FRONTEND=true
 
-RUN mkdir -p /data
 EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
