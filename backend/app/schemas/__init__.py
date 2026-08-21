@@ -1,7 +1,23 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Annotated, Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PlainSerializer
+
+from app.core.timeutil import to_iso_z
+
+
+def _ser_dt(dt: datetime) -> str:
+    return to_iso_z(dt) or ""
+
+
+def _ser_opt_dt(dt: datetime | None) -> str | None:
+    return to_iso_z(dt)
+
+
+UTCDateTime = Annotated[datetime, PlainSerializer(_ser_dt, return_type=str, when_used="json")]
+OptionalUTCDateTime = Annotated[
+    Optional[datetime], PlainSerializer(_ser_opt_dt, return_type=Optional[str], when_used="json")
+]
 
 
 class PaymentOut(BaseModel):
@@ -14,8 +30,8 @@ class PaymentOut(BaseModel):
     status: str
     fee: int
     tax: int
-    created_at: datetime
-    captured_at: Optional[datetime] = None
+    created_at: UTCDateTime
+    captured_at: OptionalUTCDateTime = None
     settlement_id: Optional[str] = None
     invoice_id: Optional[str] = None
 
@@ -29,7 +45,7 @@ class SettlementOut(BaseModel):
     tax: int
     expected_amount: int
     settled_amount: Optional[int] = None
-    settlement_date: datetime
+    settlement_date: UTCDateTime
     utr: Optional[str] = None
     status: str
     reconciliation_status: Optional[str] = None
@@ -42,7 +58,7 @@ class SettlementOut(BaseModel):
 
 class BankTransactionOut(BaseModel):
     id: str
-    date: datetime
+    date: UTCDateTime
     description: str
     reference: Optional[str] = None
     amount: int
@@ -62,7 +78,7 @@ class RefundOut(BaseModel):
     amount: int
     reason: str
     status: str
-    created_at: datetime
+    created_at: UTCDateTime
 
     model_config = {"from_attributes": True}
 
@@ -71,7 +87,7 @@ class InvoiceOut(BaseModel):
     id: str
     customer: str
     amount: int
-    due_date: datetime
+    due_date: UTCDateTime
     paid_amount: int
     status: str
 
@@ -83,7 +99,7 @@ class ExpenseOut(BaseModel):
     category: str
     vendor: str
     amount: int
-    date: datetime
+    date: UTCDateTime
     payment_status: str
 
     model_config = {"from_attributes": True}
@@ -109,8 +125,8 @@ class ExceptionOut(BaseModel):
     evidence: Optional[list[Any]] = None
     reasoning: Optional[list[Any]] = None
     requires_human_approval: bool = True
-    created_at: datetime
-    resolved_at: Optional[datetime] = None
+    created_at: UTCDateTime
+    resolved_at: OptionalUTCDateTime = None
     related_payment_ids: Optional[list[str]] = None
     related_bank_ids: Optional[list[str]] = None
 
@@ -124,7 +140,7 @@ class AuditLogOut(BaseModel):
     entity_type: Optional[str] = None
     action: str
     performed_by: str
-    timestamp: datetime
+    timestamp: UTCDateTime
     old_state: Optional[str] = None
     new_state: Optional[str] = None
     explanation: Optional[str] = None
@@ -139,7 +155,7 @@ class ActivityEventOut(BaseModel):
     event_type: str
     message: str
     entity_id: Optional[str] = None
-    created_at: datetime
+    created_at: UTCDateTime
 
     model_config = {"from_attributes": True}
 

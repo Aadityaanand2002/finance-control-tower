@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import uuid
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime
+
+from app.core.timeutil import utc_now
 from typing import Optional
 
 from sqlalchemy.orm import Session
@@ -50,7 +52,7 @@ ACTION_MAP = {
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return utc_now()
 
 
 def classify_root_cause(match: MatchResult, settlement: Optional[Settlement] = None) -> str:

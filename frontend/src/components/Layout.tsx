@@ -135,10 +135,10 @@ export default function Layout() {
 
   return (
     <div className="min-h-full flex bg-[var(--color-surface)]">
-      <div className="hidden lg:block sticky top-0 h-screen shrink-0">{sidebar}</div>
+      <div className="hidden md:block sticky top-0 h-screen shrink-0">{sidebar}</div>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-[var(--color-navy)]/30" onClick={() => setMobileOpen(false)} />
           <div className="absolute inset-y-0 left-0 shadow-xl">{sidebar}</div>
         </div>
@@ -149,7 +149,7 @@ export default function Layout() {
           <div className="px-4 sm:px-5 h-[56px] flex items-center gap-3">
             <button
               type="button"
-              className="lg:hidden rounded border border-[var(--color-border)] p-2"
+              className="md:hidden rounded border border-[var(--color-border)] p-2"
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
             >

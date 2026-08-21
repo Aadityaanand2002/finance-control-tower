@@ -1,7 +1,9 @@
 from contextlib import asynccontextmanager
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.encoders import ENCODERS_BY_TYPE
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -9,7 +11,11 @@ from fastapi.staticfiles import StaticFiles
 from app.api.routes import router
 from app.core.config import get_settings
 from app.core.database import Base, SessionLocal, engine
+from app.core.timeutil import to_iso_z
 from app.services.seed import seed_database
+
+# FastAPI jsonable_encoder bypasses Pydantic serializers for datetime; force Zulu ISO.
+ENCODERS_BY_TYPE[datetime] = lambda value: to_iso_z(value) or ""
 
 
 @asynccontextmanager

@@ -231,11 +231,19 @@ export default function ExceptionDetailPage() {
           </ol>
         </section>
         <section className="rzp-card p-4">
-          <h2 className="text-[13px] font-semibold mb-3">Audit trail</h2>
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <h2 className="text-[13px] font-semibold">Audit trail</h2>
+            <Link
+              to="/audit"
+              className="text-xs font-bold text-[var(--color-rzp)] hover:text-[var(--color-rzp-dark)]"
+            >
+              Open full Audit Trail →
+            </Link>
+          </div>
           <ul className="space-y-2 text-sm">
             {data.audit_trail.length === 0 && <li className="text-[var(--color-ink-muted)]">No actions yet.</li>}
             {data.audit_trail.map((a) => (
-              <li key={a.id} className="border-b border-slate-100 pb-2">
+              <li key={a.id} className="border-b border-[#f0f2f5] pb-2">
                 <div className="font-medium">
                   {formatDate(a.timestamp)} · {a.performed_by}
                 </div>

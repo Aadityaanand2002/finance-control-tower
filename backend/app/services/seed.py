@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from sqlalchemy.orm import Session
 
@@ -22,9 +23,14 @@ from app.exceptions.engine import upsert_exceptions_from_matches
 from app.exceptions.demo_overrides import apply_demo_narrative_overrides
 from app.reconciliation.engine import run_reconciliation
 
+_IST = ZoneInfo("Asia/Kolkata")
+
 
 def _dt(days_ago: int, hour: int = 10) -> datetime:
-    return datetime.now(timezone.utc).replace(hour=hour, minute=0, second=0, microsecond=0) - timedelta(days=days_ago)
+    """Demo clock: `hour` is India business time, stored as UTC."""
+    now_ist = datetime.now(_IST)
+    local = now_ist.replace(hour=hour, minute=0, second=0, microsecond=0) - timedelta(days=days_ago)
+    return local.astimezone(timezone.utc)
 
 
 def clear_all(db: Session) -> None:

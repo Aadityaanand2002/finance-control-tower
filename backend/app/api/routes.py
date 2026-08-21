@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -10,6 +9,7 @@ from app.ai.provider import check_rate_limit, get_ai_provider
 from app.cash.calculator import calculate_cash_position
 from app.core.config import get_settings
 from app.core.database import get_db
+from app.core.timeutil import to_iso_z, utc_now
 from app.exceptions.engine import upsert_exceptions_from_matches
 from app.exceptions.demo_overrides import apply_demo_narrative_overrides
 from app.reconciliation.engine import run_reconciliation
@@ -168,12 +168,12 @@ def get_exception(exception_id: str, db: Session = Depends(get_db)):
 
     timeline = []
     for p in payments:
-        timeline.append({"at": p.created_at.isoformat() if p.created_at else None, "label": f"Payment {p.id} captured", "kind": "payment"})
+        timeline.append({"at": to_iso_z(p.created_at), "label": f"Payment {p.id} captured", "kind": "payment"})
     if settlement:
-        timeline.append({"at": settlement.settlement_date.isoformat(), "label": f"Settlement {settlement.id}", "kind": "settlement"})
+        timeline.append({"at": to_iso_z(settlement.settlement_date), "label": f"Settlement {settlement.id}", "kind": "settlement"})
     for b in banks:
-        timeline.append({"at": b.date.isoformat(), "label": f"Bank {b.id} {b.type} ₹{b.amount/100:.2f}", "kind": "bank"})
-    timeline.append({"at": exc.created_at.isoformat(), "label": "Exception detected", "kind": "exception"})
+        timeline.append({"at": to_iso_z(b.date), "label": f"Bank {b.id} {b.type} ₹{b.amount/100:.2f}", "kind": "bank"})
+    timeline.append({"at": to_iso_z(exc.created_at), "label": "Exception detected", "kind": "exception"})
     timeline.sort(key=lambda x: x["at"] or "")
 
     return ExceptionDetailOut(
@@ -271,7 +271,7 @@ def _transition(
     old = exc.status
     exc.status = new_status
     if new_status == "resolved":
-        exc.resolved_at = datetime.now(timezone.utc)
+        exc.resolved_at = utc_now()
     db.commit()
     user = body.performed_by or settings.demo_user
     log_action(
@@ -293,7 +293,7 @@ def _transition(
             event_type="action",
             message=f"{action_label} on {exc.entity_id}",
             entity_id=exc.entity_id,
-            created_at=datetime.now(timezone.utc),
+            created_at=utc_now(),
         )
     )
     db.commit()
@@ -401,7 +401,7 @@ def activity(db: Session = Depends(get_db)):
             "event_type": r.event_type,
             "message": r.message,
             "entity_id": r.entity_id,
-            "created_at": r.created_at,
+            "created_at": to_iso_z(r.created_at),
         }
         for r in rows
     ]

@@ -43,9 +43,15 @@ export function statusClass(status: string): string {
   return 'text-[#4a4a5a] bg-[#f5f6f8]'
 }
 
+/** Parse API timestamps (UTC Z or IST offset) and show India local time. */
 export function formatDate(iso?: string | null): string {
   if (!iso) return '—'
-  return new Date(iso).toLocaleString('en-IN', {
+  const hasZone = /Z$/i.test(iso) || /[+-]\d{2}:\d{2}$/.test(iso)
+  const normalized = iso.includes('T') && !hasZone ? `${iso}Z` : iso
+  const d = new Date(normalized)
+  if (Number.isNaN(d.getTime())) return '—'
+  return d.toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
     day: '2-digit',
     month: 'short',
     year: 'numeric',

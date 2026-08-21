@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
+from app.core.timeutil import utc_now
 from app.models import ActivityEvent, BankTransaction, Expense, Invoice, Payment, Refund, Settlement
 from app.exceptions.engine import upsert_exceptions_from_matches
 from app.exceptions.demo_overrides import apply_demo_narrative_overrides
@@ -14,8 +14,8 @@ from app.reconciliation.engine import run_reconciliation
 from app.schemas import ActivityEventOut, SimulationResult
 
 
-def _now() -> datetime:
-    return datetime.now(timezone.utc)
+def _now():
+    return utc_now()
 
 
 def _event(db: Session, event_type: str, message: str, entity_id: str | None = None) -> ActivityEvent:
